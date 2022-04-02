@@ -20,6 +20,8 @@ int main()
     // inputs/constants---------------------------------------
 
     int N_i, N_uis, N_max, N_th, N_gc, N_kvec_pairs, N_circ = 0, N_is = 0;
+    int N_match = 0;
+    double four_stars[4][4];
     double epsilon, q, m, foc, y_max, y_min, delta;
     int i = 0, j = 0, countt = 0, k = 0;
     // -------------------------------------------------------
@@ -41,11 +43,10 @@ int main()
     N_uis = N_i;
     //CORTOS_INFO("Enter the maximum number of iterations (< no. of input stars) you want the algorithm to run :- ");
     //scanf("%d", &N_max);
-    N_max = 25;
+    N_max = 24;
     //CORTOS_INFO("Enter the maximum number of matched stars you want :- ");
     //scanf("%d", &N_th);
-    N_th = 25;
-
+    N_th = 2;
     //--------------------------------------------------------
     // taking input of the K vector catalogue
     //FILE *file;
@@ -112,13 +113,16 @@ int main()
     // -------------------------------------------------------------------------------------------------------
     int sm_IS[N_gc][2]; // array for storing the matched stars
     memset(sm_IS, -1, N_gc * sizeof(sm_IS[0]));
+    //CORTOS_DEBUG("114");
 
     // sorting the UIS table according to Euclidean distance
     bubbleSort(UIS, N_i);
+    //CORTOS_DEBUG("118");
 
     double sm_3D_vecs[N_i][4]; // this stores the 3D vectors generated from the UIS table
     // generating 3D vectors from the sorted UIS table
     sm_gnrt_3D_vec(sm_3D_vecs, UIS, foc, N_i);
+   // CORTOS_DEBUG("119");
 
     // main algo starts here
     int circ_flag = 1; // flag which stores the number of times the sm_3D_vecs table has been circulated
@@ -126,14 +130,17 @@ int main()
     i = 1;
     for (i; i <= N_max; i++) // N_max is the maximum number of times we want to run the code
     {
-
+        //CORTOS_DEBUG("131");
         if (N_uis >= 4 && N_is < N_th) // N_uis >= 4 for running 4 star algo & N_is(identified stars) < N_th(threshold number of matched stars)
         {
-            int N_match = 0; // variable for storing the number of stars matched in a particular iteration
-            double four_stars[4][4]; // this will store the extracted 4 stars from the sm_3D_vecs table
+            //int N_match = 0; // variable for storing the number of stars matched in a particular iteration
+            N_match = 0;
+            //CORTOS_DEBUG("138");
+            //double four_stars[4][4]; // this will store the extracted 4 stars from the sm_3D_vecs table
             //for (int countt = 0, j = 0; j < N_i && countt < 4; j++) // here the variable countt is used just to count whether 4 stars have been extracted
             for (countt, j; j < N_i && countt < 4; j++) // here the variable countt is used just to count whether 4 stars have been extracted
             {
+               // CORTOS_DEBUG("143");
                 if ((int)sm_3D_vecs[j][0] != -1)
                 {
 
@@ -145,6 +152,7 @@ int main()
                 }
             }
             sm_4_star(four_stars, sm_3D_vecs, sm_IS, sm_K_vec_arr, &N_match, N_i, N_gc, delta, q, m);
+           // CORTOS_DEBUG("155");
             N_uis -= N_match;
             N_is += N_match;
             if (N_match == 0 && N_circ <= 2 * N_i) // if no stars are matched then we must circulate the sm_3D_vecs table
@@ -162,6 +170,7 @@ int main()
             break;
         }
     }
+   // CORTOS_DEBUG("167");
     i = 0;
     j = 0;
     k = 0;

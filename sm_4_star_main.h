@@ -32,7 +32,7 @@ void sm_4_star (double four_stars[][4], double sm_3D_vecs[][4], int sm_IS[][2], 
     }
     i = 0;
     j = 0;
-    
+    //CORTOS_DEBUG("35_sm_4_star_main");
     double p[6]; // this stores the angular distances between each of the 4 pairs in the four_stars array
     int ct = 0;
     // below loop calculates angular distances between each pairs and stores them in the array p
@@ -64,7 +64,7 @@ void sm_4_star (double four_stars[][4], double sm_3D_vecs[][4], int sm_IS[][2], 
 
         if (k_top < 0 || k_bot >= 188807)
         {
-            printf("bad values : k_bot = %d, k_top = %d\n", k_bot, k_top);
+            //CORTOS_INFO("bad values : k_bot = %d, k_top = %d\n", k_bot, k_top);
             continue;
         }
         else
