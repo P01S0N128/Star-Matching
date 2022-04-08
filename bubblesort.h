@@ -5,11 +5,11 @@
 
 void bubbleSort(double arr[][3], int n)
 {
-    int i = 0, j = 0;
+    int i, j;
     double temp[3];
-    for (i; i < n; i++)
+    for (i = 0; i < n; i++)
     {
-        for (j; j < n - i - 1; j++)
+        for (j = 0; j < n - i - 1; j++)
         {
             if (arr[j][1] * arr[j][1] + arr[j][2] * arr[j][2] > arr[j + 1][1] * arr[j + 1][1] + arr[j + 1][2] * arr[j + 1][2])
             {
