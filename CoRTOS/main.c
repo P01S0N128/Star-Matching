@@ -34,8 +34,8 @@ int main()
     // Some other constants
     y_max = 0.999999999992621;
     y_min = 0.973988966620749;
-    N_kvec_pairs = 224792;
-    N_gc = 8876;
+    N_kvec_pairs = 188807;
+    N_gc = 5060;
 
     // Inputs - will come from FE block. 
     /*printf("Enter the number of stars in input test file :- ");
