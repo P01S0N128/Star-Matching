@@ -1,5 +1,5 @@
 //#include <stdio.h>
-#include "CORTOS.h"
+#include "cortos.h"
 #include <stdlib.h>
 #include <math.h>
 
