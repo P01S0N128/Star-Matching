@@ -32,7 +32,7 @@ for i in range(len(kvec)):
 
     UIS=UIS.rstrip(UIS[-1])
     UIS+="}"
-    filedata+="long double UIS[CORTOS_N_i][3]={"+UIS+"};\n"
+    filedata+=f'long double UIS_{i}[CORTOS_N_i][3]={UIS};\n'
     UISname = f'UIS_{i}.h'
     with open(UISname, 'w') as file :
         file.write(filedata)
