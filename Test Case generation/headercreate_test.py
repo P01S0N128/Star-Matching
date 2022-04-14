@@ -22,7 +22,7 @@ for i in range(len(kvec)):
     N_i.append(len(kvec[i])//3)
 for i in range(len(kvec)):
     filedata = "#include <cortos.h>\n" 
-    filedata+=f"//CORTOS_N_i - Number of input centroids\n#define CORTOS_N_i {N_i[i]}\n"
+    filedata+=f"//CORTOS_N_i_{i} - Number of input centroids\n#define CORTOS_N_i_{i} {N_i[i]}\n"
     UIS ="{"
     for j in range(N_i[i]):
         UIS+="{"
@@ -32,7 +32,7 @@ for i in range(len(kvec)):
 
     UIS=UIS.rstrip(UIS[-1])
     UIS+="}"
-    filedata+=f'long double UIS_{i}[CORTOS_N_i][3]={UIS};\n'
+    filedata+=f'long double UIS_{i}[CORTOS_N_i_{i}][3]={UIS};\n'
     UISname = f'UIS_{i}.h'
     with open(UISname, 'w') as file :
         file.write(filedata)
