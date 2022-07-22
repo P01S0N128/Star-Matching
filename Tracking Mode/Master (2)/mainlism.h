@@ -1,4 +1,4 @@
-//#include <stdio.h>
+// #include <stdio.h>
 #include "cortos.h"
 #include <stdlib.h>
 #include <math.h>
@@ -14,23 +14,10 @@
 #include "sm_K_vec_arr.h"
 #include "sm_GC.h"
 
-#include "UIS_0.h"
-#include "UIS_1.h"
-#include "UIS_2.h"
-#include "UIS_3.h"
-#include "UIS_4.h"
-#include "UIS_5.h"
-#include "UIS_6.h"
-#include "UIS_7.h"
-#include "UIS_8.h"
-#include "UIS_9.h"
 
-//int sm_K_vec_arr[224792][3]; Will be declared in header file
-// int sm_K_vec_arr[188807][3]; // declared here because array of such sizes can't be declared inside main() in C
-
-void sm(long double UIS[][3], int N_i)
+int sm(long double UIS[][3], int N_i, long double body_vecs_IS[][4], int sm_IS[][2])
 {
-    uint64_t t1 = cortos_get_clock_time();
+    // uint64_t t1 = cortos_get_clock_time();
     int i, countt, j, k; //Declaring counter variables
     // inputs/constants---------------------------------------
 
@@ -65,58 +52,13 @@ void sm(long double UIS[][3], int N_i)
     N_max = 25;
     //printf("Enter the maximum number of matched stars you want :- ");
     //scanf("%d", &N_th);
-    N_th = 8;
+    N_th = 25;
 
-    //--------------------------------------------------------
-    // taking input of the K vector catalogue
-    /*FILE *file;
-    file = fopen("sm_Reference_Star_Catalogue_4SM_6.5.txt", "r");
-    // file = fopen("kvec.txt", "r");
-    for (int i = 0; i < N_kvec_pairs; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            int temp;
-            fscanf(file, "%d", &temp);
-            sm_K_vec_arr[i][j] = temp;
-        }
-    }
-    fclose(file);
+    //Constants for validation
+    double tol = TOL;
+    double p_1 = P1;
+    double p_2 = P2;
 
-    // taking input of test file
-    long double UIS[N_i][3];     // 2D array for storing (x,y) coordinates and star IDs of unidentified stars
-    FILE *file2;
-    file2 = fopen("sm_test_case_dummy2.txt", "r");
-    // file2 = fopen("sm_test_case_2.txt", "r"); // type the name of your input test file here
-    // file2 = fopen("sample_input.txt", "r");
-    for (int i = 0; i < N_i; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            long double temp;
-            fscanf(file2, "%Lf", &temp);
-            UIS[i][j] = temp;
-        }
-    }
-    fclose(file2);
-
-    // taking input of Guide star catalogue
-    double sm_GC[8876][4];
-    // double sm_GC[5060][4];
-    FILE *file3;
-    file3 = fopen("sm_Guide_Star_Catalogue_6.5.txt", "r");
-    // file3 = fopen("gsc.txt", "r"); 
-    for (int i = 0; i < N_gc; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            long double temp;
-            fscanf(file3, "%Lf", &temp);
-            sm_GC[i][j] = temp;
-        }
-    }
-    fclose(file3);
-    */
     //--------------------------------------------------------
     // constants for using the k vector table (to be used in the 4 star matching)
 
@@ -127,11 +69,10 @@ void sm(long double UIS[][3], int N_i)
     // printf("Q is %0.15Lf\n", q);
     
     // -------------------------------------------------------------------------------------------------------
-    int sm_IS[N_gc][2]; // array for storing the matched stars
-    long double body_vecs_IS[N_gc][4]; //Array for storing corresponding body frame vectors for matched stars
+    //int sm_IS[N_gc][2]; // array for storing the matched stars
+    //long double body_vecs_IS[N_gc][4]; //Array for storing corresponding body frame vectors for matched stars
     memset(sm_IS, -1, N_gc * sizeof(sm_IS[0]));
     memset(body_vecs_IS, -1, N_gc * sizeof(body_vecs_IS[0]));
-
 
     // sorting the UIS table according to Euclidean distance
     // bubbleSort(UIS, N_i);
@@ -150,19 +91,8 @@ void sm(long double UIS[][3], int N_i)
     // generating 3D vectors from the sorted UIS table
     sm_gnrt_3D_vec(sm_3D_vecs, UIS, foc, N_i);
 
-    // for (int i = 0; i < N_i; i++)
-    // {
-    //     for (int j = 0; j < 4; j++)
-    //     {
-    //         printf("%Lf ", sm_3D_vecs[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
     // main algo starts here
     int circ_flag = 1; // flag which stores the number of times the sm_3D_vecs table has been circulated
-    //for (int i = 1; i <= N_max; i++) // N_max is the maximum number of times we want to run the code
-    uint64_t t2 = cortos_get_clock_time(); //Constant declarations
     for (i = 1; i <= N_max; i++)
     {
        
@@ -205,16 +135,17 @@ void sm(long double UIS[][3], int N_i)
             break;
         }
     }
-    uint64_t t3 = cortos_get_clock_time();
     printf(" \n Before Verification, Total matched stars :- %d\n\n", N_is);
     printf("  Input_ID  Desired_star_ID  X             Y             Z          X_b         Y_b         Z_b\n");
     printf("-----------------------------------------------------------------------------------------------------\n");
     //for (int i = 0; i < N_gc; i++)
     //for (i = 0; i < N_gc; i++)
+    int c=0;
     for (i = 0; i < N_i; i++)
     {
         if ((int)sm_IS[i][0]!=-1)
         {
+            c++;
             printf("%d     %d      %d         ", i, sm_IS[i][0], sm_IS[i][1]);
             //for (int j = 1; j < 4; j++)
             for (j = 1; j < 4; j++)
@@ -250,42 +181,5 @@ void sm(long double UIS[][3], int N_i)
             printf("\n");
         }
     }
-    uint32_t t11 = t1&(0xffffffff);
-    uint32_t t12 = t2&(0xffffffff);
-    uint32_t t23 = t3&(0xffffffff);
-    // cortos_printf("\ntime required for constant declaration is %u \n", t12-t11);
-    cortos_printf("\ntime required is %u \n", t23-t12);
-}
-int main(){
-    cortos_printf("TEST CASE 1:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_0, CORTOS_N_i_0);
-    cortos_printf("TEST CASE 2:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_1, CORTOS_N_i_1);
-    cortos_printf("TEST CASE 3:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_2, CORTOS_N_i_2);
-    cortos_printf("TEST CASE 4:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_3, CORTOS_N_i_3);
-    cortos_printf("TEST CASE 5:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_4, CORTOS_N_i_4);
-    cortos_printf("TEST CASE 6:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_5, CORTOS_N_i_5);
-    cortos_printf("TEST CASE 7:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_6, CORTOS_N_i_6);
-    cortos_printf("TEST CASE 8:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_7, CORTOS_N_i_7);
-    cortos_printf("TEST CASE 9:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_8, CORTOS_N_i_8);
-    cortos_printf("TEST CASE 10:-\n");
-    cortos_printf("-------------------------------------------------------------------\n");
-    sm(UIS_9, CORTOS_N_i_9);
-    cortos_exit(0);
+    return c;
 }
