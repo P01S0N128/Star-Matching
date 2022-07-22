@@ -16,21 +16,22 @@ int already_matched(int sm_IS[][2],int indx,int N_gc){
     return 0;
 }
 
-void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[][2], long double body_vecs_IS[][4], int sm_K_vec_arr[][3], int *N_match, int N_i, int N_gc, double delta, double q, double m)
+void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[][2], int sm_K_vec_arr[][3], int *N_match, int N_i, int N_gc, double delta, double q, double m)
 {
     uint64_t t1 = cortos_get_clock_time();
     int i, j, k;
-    double SIM[N_gc][6]; 
+    double SIM[N_gc][6]; // SIM implies star identification matrix which is basically the table in which we set those values as 1 
+                         // which are corresponding to the star ids obtained from the kvec catalogue
+    //for (int i = 0; i < N_gc; i++)
+    /*for (i = 0; i < N_gc; i++)
+    {
+        //for (int j = 0; j < 6; j++)
+        for (j = 0; j < 6; j++)
+        {
+            SIM[i][j] = 0;
+        }
+    }*/
     memset(SIM, 0, N_gc * 6 *  sizeof(SIM[0][0]));
-
-    int SIM_indx_arr[1000];
-    memset(SIM_indx_arr,0, 1000*sizeof(SIM_indx_arr[0]));
-
-    int SIM_flags[N_GC];
-    memset(SIM_flags, 0, N_GC*sizeof(SIM_flags[0]));
-
-    int top_indx = 0;
-
      uint64_t t3 = cortos_get_clock_time();
     uint32_t txx = t1&(0xffffffff);
     uint32_t t13 = t3&(0xffffffff);
@@ -106,8 +107,6 @@ void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[]
             if (k_start==k_end)
             {
             	SIM[sm_K_vec_arr[k_end-1][0]][j] = 1;
-                SIM_indx_arr[top_indx]=sm_K_vec_arr[k_end-1][0];
-                top_indx ++;
             }
             else
             {
@@ -116,11 +115,6 @@ void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[]
 	            {
 	                SIM[sm_K_vec_arr[i-1][0]][j] = 1; // sm_K_vec_arr[i][1 (or 2)] gives you the star ids which CAN be the unidentified stars
 	                SIM[sm_K_vec_arr[i-1][1]][j] = 1;
-                     SIM_indx_arr[top_indx]=sm_K_vec_arr[i-1][0];
-                    // printf("smkvecarr0 = %d, %d\n", sm_K_vec_arr[i-1][0], top_indx);
-                    SIM_indx_arr[top_indx+1]=sm_K_vec_arr[i-1][1];
-                    // printf("smkvecarr1 = %d, %d\n", sm_K_vec_arr[i-1][1], top_indx);
-                    top_indx +=2;
 	            }
             }
         }
@@ -138,27 +132,9 @@ void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[]
     {
         int matched_rows = 0; // this stores the number of rows matched
         int temp = 0; // this variable stores the row number of the matched row
-        for(i=0; i<top_indx; i++)
+        //for (int k = 0; k < N_gc; k++)
+        for (k = 0; k < N_gc; k++)
         {
-            SIM_flags[SIM_indx_arr[i]] = 1;
-        }    
-            
-        // for (k = 0; k < N_GC; k++)
-        // {
-        //     if (SIM[k][0] == checks[j][0] && SIM[k][1] == checks[j][1] && SIM[k][2] == checks[j][2] && SIM[k][3] == checks[j][3] && SIM[k][4] == checks[j][4] && SIM[k][5] == checks[j][5])
-        //     {
-        //         matched_rows++;
-        //         printf("k = %d\n", k);
-        //         temp = k;
-        //     }
-        // }
-
-        for (i = 0; i <top_indx; i++)
-        {
-              k = SIM_indx_arr[i];
-
-             if(SIM_flags[SIM_indx_arr[i]]==1)
-          { 
             if (SIM[k][0] == checks[j][0]
              && SIM[k][1] == checks[j][1]
              && SIM[k][2] == checks[j][2]
@@ -167,22 +143,19 @@ void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[]
              && SIM[k][5] == checks[j][5])
             {
                 matched_rows++;
-                // printf("k = %d\n", k);
                 temp = k;
             }
-
-            SIM_flags[k]=0;
-          }
         }
-        
         if (matched_rows == 1)
         {
             int flag = already_matched(sm_IS, (int)four_stars[j][0], N_i);
+            //int flag = already_matched(sm_IS, (int)four_stars[j][0], N_gc);
             // int flag = 0;// DELETE ASAP
             if (flag == 0) // checking if that star has earlier been matched
             {
                 (*N_match)++;
-                for (int k = 0; k < N_i; k++)
+                //for (int k = 0; k < N_i; k++)
+                for (k = 0; k < N_i; k++)
                 {
                     // below is the substitute for removing the identified star from the 3D vector array
                     if ((int)sm_3D_vecs[k][0] == (int)four_stars[j][0]) 
@@ -191,16 +164,14 @@ void sm_4_star (double four_stars[][4], long double sm_3D_vecs[][4], int sm_IS[]
                         break;
                     }
                 }
-                for (int k = 0; k < N_i; k++)
+                //for (int k = 0; k < N_gc; k++)
+                //for (k = 0; k < N_gc; k++)
+                for (k = 0; k < N_i; k++)
                 {
                     if (sm_IS[k][0]==-1)
                     {
                         sm_IS[k][0] = (int)four_stars[j][0];
-                        body_vecs_IS[k][0] = four_stars[j][0];
                         sm_IS[k][1] = temp;
-                        for (int i = 1; i < 4; i++){
-                            body_vecs_IS[k][i] = four_stars[j][i]; 
-                        }
                         break;
                     }
                 }

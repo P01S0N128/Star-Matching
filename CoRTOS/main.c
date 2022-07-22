@@ -9,7 +9,6 @@
 #include "sm_4_star_circulate.h"
 #include "bubblesort.h"
 #include "sm_constants.h"
-#include "sm_validation.h"
 
 #include "sm_K_vec_arr.h"
 #include "sm_GC.h"
@@ -128,10 +127,7 @@ void sm(long double UIS[][3], int N_i)
     
     // -------------------------------------------------------------------------------------------------------
     int sm_IS[N_gc][2]; // array for storing the matched stars
-    long double body_vecs_IS[N_gc][4]; //Array for storing corresponding body frame vectors for matched stars
     memset(sm_IS, -1, N_gc * sizeof(sm_IS[0]));
-    memset(body_vecs_IS, -1, N_gc * sizeof(body_vecs_IS[0]));
-
 
     // sorting the UIS table according to Euclidean distance
     // bubbleSort(UIS, N_i);
@@ -184,7 +180,7 @@ void sm(long double UIS[][3], int N_i)
                     countt++;
                 }
             }
-            sm_4_star(four_stars, sm_3D_vecs, sm_IS, body_vecs_IS, sm_K_vec_arr, &N_match, N_i, N_gc, delta, q, m);
+            sm_4_star(four_stars, sm_3D_vecs, sm_IS, sm_K_vec_arr, &N_match, N_i, N_gc, delta, q, m);
             N_uis -= N_match;
             N_is += N_match;
 
@@ -206,54 +202,28 @@ void sm(long double UIS[][3], int N_i)
         }
     }
     uint64_t t3 = cortos_get_clock_time();
-    printf(" \n Before Verification, Total matched stars :- %d\n\n", N_is);
-    printf("  Input_ID  Desired_star_ID  X             Y             Z          X_b         Y_b         Z_b\n");
-    printf("-----------------------------------------------------------------------------------------------------\n");
+    cortos_printf(" \nTotal matched stars :- %d\n\n", N_is);
+    cortos_printf("  Input_ID  Desired_star_ID  X             Y             Z\n");
+    cortos_printf("-------------------------------------------------------------------\n");
     //for (int i = 0; i < N_gc; i++)
     //for (i = 0; i < N_gc; i++)
     for (i = 0; i < N_i; i++)
     {
-        if ((int)sm_IS[i][0]!=-1)
+        if (sm_IS[i][0]!=-1)
         {
-            printf("%d     %d      %d         ", i, sm_IS[i][0], sm_IS[i][1]);
+            cortos_printf("%d     %d      %d         ", i, sm_IS[i][0], sm_IS[i][1]);
             //for (int j = 1; j < 4; j++)
             for (j = 1; j < 4; j++)
             {
-                printf("%lf    ", sm_GC[(int)sm_IS[i][1] - 1][j]);
+                cortos_printf("%lf    ", sm_GC[sm_IS[i][1]][j]);
             }
-            for (j = 1; j < 4; j++){
-                printf("%Lf     ", body_vecs_IS[i][j]);
-            }
-            printf("\n");
-        }
-    }
-    printf("----------------------------------------------------------------------------------------------------\n");
-    sm_validate(sm_3D_vecs, sm_IS, body_vecs_IS, sm_GC, &N_is, N_i, N_gc, tol, p_1, p_2);
-    printf(" \nAfter verification, Total matched stars :- %d\n\n", N_is);
-    printf("  Input_ID  Desired_star_ID  X             Y             Z          X_b         Y_b         Z_b\n");
-    printf("----------------------------------------------------------------------------------------------------\n");
-    //for (int i = 0; i < N_gc; i++)
-    //for (i = 0; i < N_gc; i++)
-    for (i = 0; i < N_i; i++)
-    {
-        if ((int)sm_IS[i][0]!=-1)
-        {
-            printf("%d     %d      %d         ", i, sm_IS[i][0], sm_IS[i][1]);
-            //for (int j = 1; j < 4; j++)
-            for (j = 1; j < 4; j++)
-            {
-                printf("%lf    ", sm_GC[(int)sm_IS[i][1] - 1][j]);
-            }
-            for (j = 1; j < 4; j++){
-                printf("%Lf     ", body_vecs_IS[i][j]);
-            }
-            printf("\n");
+            cortos_printf("\n");
         }
     }
     uint32_t t11 = t1&(0xffffffff);
     uint32_t t12 = t2&(0xffffffff);
     uint32_t t23 = t3&(0xffffffff);
-    // cortos_printf("\ntime required for constant declaration is %u \n", t12-t11);
+    cortos_printf("\ntime required for constant declaration is %u \n", t12-t11);
     cortos_printf("\ntime required is %u \n", t23-t12);
 }
 int main(){
